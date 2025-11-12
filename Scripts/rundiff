@@ -1,0 +1,29 @@
+#!/bin/csh
+
+# Split cpp file names by comma
+set IFS=','
+set cpps = ( `echo $argv[1] | tr ',' ' '` )
+
+# Build cppString
+set cppString = ""
+foreach item ($cpps)
+	set cppString = "$cppString $item.cpp"
+end
+
+# Get executable name
+set exe = $cpps[1]
+
+# Compile
+g++ -Wextra -Wall -o $exe $cppString
+
+# Run executable with input/output files
+if ($status == 0) then
+    if ( $#argv > 1 ) then
+		./$exe $2.in $argv[3-] > $2.out
+	else
+		./$exe $2.in > $2.out
+	endif
+endif
+
+# Run diff
+dif $2

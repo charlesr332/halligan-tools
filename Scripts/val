@@ -1,0 +1,26 @@
+#!/bin/csh
+
+# Split cpp file names by comma
+set IFS=','
+set cpps = ( `echo $argv[1] | tr ',' ' '` )
+
+# Build cppString
+set cppString = ""
+foreach item ($cpps)
+	set cppString = "$cppString $item.cpp"
+end
+
+# Get executable name
+set exe = $cpps[1]
+
+# Compile
+g++ -g -Wextra -Wall -o $exe $cppString
+
+# Run executable with valgrind
+if ($status == 0) then
+    if ( $#argv > 1 ) then
+		valgrind ./$exe $argv[2-]
+	else
+		valgrind ./$exe
+	endif
+endif
