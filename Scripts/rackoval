@@ -1,0 +1,13 @@
+#!/bin/csh
+
+echo "---------- deck0_random_test ----------"
+val "rack-o,game,deck,card,hand,discard_pile" "deck0.txt" < "deck0_random_test.in"
+
+echo "\n---------- deck1_draw_test ----------"
+val "rack-o,game,deck,card,hand,discard_pile" "deck1.txt" < "deck1_draw_test.in"
+
+echo "\n---------- deck1_nodraw_test ----------"
+val "rack-o,game,deck,card,hand,discard_pile" "deck1.txt" < "deck1_nodraw_test.in"
+
+echo "\n---------- deck1_discard_test ----------"
+val "rack-o,game,deck,card,hand,discard_pile" "deck1.txt" < "deck1_discard_test.in"
