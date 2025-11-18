@@ -18,7 +18,7 @@ g++ -Wextra -Wall -o $exe $cppString
 
 # Run executable with input/output files
 if ($status == 0) then
-    if ( $#argv > 1 ) then
+    if ($#argv > 1) then
 		./$exe $2.in $argv[3-] > $2.out
 	else
 		./$exe $2.in > $2.out
