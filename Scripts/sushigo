@@ -1,0 +1,48 @@
+#!/bin/csh
+
+g++ -g -Wextra -Wall -o sushigo *.cpp
+
+echo "---------- sushi input1 ----------"
+./sushigo "sushi.data" false < input1.in > input1.out
+sleep 0.5
+dif input1
+
+echo "\n---------- sushi input2 ----------"
+./sushigo sushi.data false < input2.in > input2.out
+sleep 0.5
+dif input2
+
+echo "\n---------- sushi tempura ----------"
+./sushigo sushi.data false < tempura.in > tempura.out
+sleep 0.5
+dif tempura
+
+echo "\n---------- shuffled input1 ----------"
+./sushigo shuffled.data false < input1.in > input1shuffled.out
+sleep 0.5
+dif input1shuffled
+
+echo "\n---------- shuffled input2 ----------"
+./sushigo shuffled.data false < input2.in > input2shuffled.out
+sleep 0.5
+dif input2shuffled
+
+echo "\n---------- shuffled tempura ----------"
+./sushigo shuffled.data false < tempura.in > tempurashuffled.out
+sleep 0.5
+dif tempurashuffled
+
+echo "\n---------- stacked input1 ----------"
+./sushigo stacked.data false < input1.in > input1stacked.out
+sleep 0.5
+dif input1stacked
+
+echo "\n---------- stacked input2 ----------"
+./sushigo stacked.data false < input2.in > input2stacked.out
+sleep 0.5
+dif input2stacked
+
+echo "\n---------- stacked tempura ----------"
+./sushigo stacked.data false < tempura.in > tempurastacked.out
+sleep 0.5
+dif tempurastacked

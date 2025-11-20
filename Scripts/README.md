@@ -18,7 +18,11 @@
   - Example: `rundiff cipher test1` executes `run cipher test1.in > test1.out` then `dif test1`
 - `val`: Same as `run` except runs the executable with Valgrind
   - Example: `val cipher test1.in` executes `run cipher test1.in` then `valgrind ./cipher`
+
+### HW Specific
 - `racko`: This is a script specific to CS11 HW10 (Rack-O). It executes all of the `run` and `dif` commands for all included tests.
   - Usage: Execute `racko` in the same directory as your HW10 files
 - `rackoval`: Similar to `racko` except runs Valgrind for each test, printing the output in console
   - Usage: Execute `rackoval` in the same directory as your HW10 files
+- `sushigo`: Similar to `racko` except it's for CS11 HW11 (Final Project: Sushi Go!)
+  - Usage: Execute `sushigo` in the same directory as your HW11 files
