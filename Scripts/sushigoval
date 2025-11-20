@@ -4,62 +4,53 @@ echo "Compiling..."
 g++ -g -Wextra -Wall -o sushigo *.cpp
 echo
 
-./sushigo "sushi.data" false < input1.in > input1.out
-dif input1
+valgrind ./sushigo "sushi.data" false < input1.in > input1.out
 echo "\n^^^^^^^^^^ sushi input1 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo sushi.data false < input2.in > input2.out
-dif input2
+valgrind ./sushigo sushi.data false < input2.in > input2.out
 echo "\n^^^^^^^^^^ sushi input2 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo sushi.data false < tempura.in > tempura.out
-dif tempura
+valgrind ./sushigo sushi.data false < tempura.in > tempura.out
 echo "\n^^^^^^^^^^ sushi tempura ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo shuffled.data false < input1.in > input1shuffled.out
-dif input1shuffled
+valgrind ./sushigo shuffled.data false < input1.in > input1shuffled.out
 echo "\n^^^^^^^^^^ shuffled input1 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo shuffled.data false < input2.in > input2shuffled.out
-dif input2shuffled
+valgrind ./sushigo shuffled.data false < input2.in > input2shuffled.out
 echo "\n^^^^^^^^^^ shuffled input2 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo shuffled.data false < tempura.in > tempurashuffled.out
-dif tempurashuffled
+valgrind ./sushigo shuffled.data false < tempura.in > tempurashuffled.out
 echo "\n^^^^^^^^^^ shuffled tempura ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo stacked.data false < input1.in > input1stacked.out
-dif input1stacked
+valgrind ./sushigo stacked.data false < input1.in > input1stacked.out
 echo "\n^^^^^^^^^^ stacked input1 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo stacked.data false < input2.in > input2stacked.out
-dif input2stacked
+valgrind ./sushigo stacked.data false < input2.in > input2stacked.out
 echo "\n^^^^^^^^^^ stacked input2 ^^^^^^^^^^"
 read -n 1 -s -r -p "Press any key to continue..."
 echo
 echo
 
-./sushigo stacked.data false < tempura.in > tempurastacked.out
-dif tempurastacked
+valgrind ./sushigo stacked.data false < tempura.in > tempurastacked.out
 echo "\n^^^^^^^^^^ stacked tempura ^^^^^^^^^^"
