@@ -1,0 +1,32 @@
+#!/bin/csh
+
+# Array of data files
+set datafiles = (sushi shuffled stacked tie few)
+# Array of input files
+set inputs = (input1 input2 input3 input4 tempura invalid tie)
+
+# Get chopsticks value (default false)
+if ("$1" == "true") then
+    set chopsticks = true
+else
+    set chopsticks = false
+endif
+
+# Compile
+echo "Compiling..."
+g++ -g -Wextra -Wall -o sushigo *.cpp
+echo "\n^^^^^^^^^^ COMPILATION ^^^^^^^^^^"
+read -n 1 -s -r -p "Press any key to continue..."
+echo
+echo
+
+# Run Valgrinds
+foreach datafile ($datafiles)
+    foreach input ($inputs)
+		valgrind ./sushigo "${datafile}.data" "$chopsticks" < "${input}.in" > /dev/null
+        echo "\n^^^^^^^^^^ $datafile $input ^^^^^^^^^^"
+        #read -n 1 -s -r -p "Press any key to continue..."
+        echo
+        echo
+    end
+end

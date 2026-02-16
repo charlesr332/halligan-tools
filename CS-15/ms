@@ -1,0 +1,61 @@
+#!/bin/bash
+
+testFolder="test"
+
+# Get station and commands file names
+stations="s$1"
+commands="c$2"
+combined="${stations}${commands}"
+folder="${testFolder}/${combined}"
+
+# Get stations and commands files
+stationsFile="${testFolder}/${stations}"
+if [[ ! -f "$stationsFile" ]]; then
+    echo "Error: $stationsFile does not exist!"
+    exit 1
+fi
+commandsFile="${testFolder}/${commands}"
+if [[ ! -f "$commandsFile" ]]; then
+    echo "Error: $commandsFile does not exist!"
+    exit 1
+fi
+
+# Get out and std prefixes
+combinedPrefix="${folder}/${combined}"
+out="${combinedPrefix}.out"
+stdOut="${combinedPrefix}.stdOut"
+stdErr="${combinedPrefix}.stdErr"
+
+# Get final file names
+outRef="${out}.ref"
+stdOutRef="${stdOut}.ref"
+stdErrRef="${stdErr}.ref"
+outMe="${out}.me"
+stdOutMe="${stdOut}.me"
+stdErrMe="${stdErr}.me"
+
+
+# Create directory
+echo -e "Creating directory:"
+mkdir -p $folder
+
+# Create references
+echo -e "\nCreating $outRef, $stdOutRef, and ${stdErrRef}:"
+./the_MetroSim "$stationsFile" "$outRef" "$commandsFile" > "$stdOutRef" 2> "$stdErrRef"
+
+# Compile me using make
+echo -e "\nCompiling with make:"
+make
+
+# Create mes
+echo -e "\nCreating $outMe, $stdOutMe, and ${stdErrMe}:"
+./MetroSim "$stationsFile" "$outMe" "$commandsFile" > "$stdOutMe" 2> "$stdErrMe"
+
+# Diff
+echo -e "\nRunning diffs:"
+echo -e "\n--- $outRef vs $outMe ---\n"
+diff "$outRef" "$outMe"
+echo -e "\n\n--- $stdOutRef vs $stdOutMe ---\n"
+diff "$stdOutRef" "$stdOutMe"
+echo -e "\n\n--- ${stdErrRef} vs $stdErrMe ---\n"
+diff "$stdErrRef" "$stdErrMe"

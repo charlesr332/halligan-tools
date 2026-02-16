@@ -1,0 +1,29 @@
+#!/bin/csh
+
+# Array of data files
+set datafiles = (sushi shuffled stacked tie few)
+# Array of input files
+set inputs = (input1 input2 input3 input4 tempura invalid tie)
+
+# Get chopsticks value (default false)
+if ("$1" == "true") then
+    set chopsticks = true
+else
+    set chopsticks = false
+endif
+
+# Get demo mode
+if ("$2" == "p1") then
+    set demo = 'p1_sushi_demo'
+else
+    set demo = 'sushi_demo'
+endif
+
+# Generate ground truth files
+foreach datafile ($datafiles)
+    foreach input ($inputs)
+        set outfile = "${input}${datafile}"
+        ${demo} ${datafile}.data ${chopsticks} < ${input}.in > ${outfile}.gt
+        echo "Generated ${outfile}.gt"
+    end
+end
