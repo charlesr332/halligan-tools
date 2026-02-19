@@ -22,8 +22,31 @@ fi
 # Compile me using make
 echo -e "\nCompiling with make:"
 make
+#!/bin/bash
+
+testFolder="test"
+
+# Get station and commands file names
+stations="s$1"
+commands="c$2"
+
+# Get stations and commands files
+stationsFile="${testFolder}/${stations}"
+if [[ ! -f "$stationsFile" ]]; then
+    echo "Error: $stationsFile does not exist!"
+    exit 1
+fi
+commandsFile="${testFolder}/${commands}"
+if [[ ! -f "$commandsFile" ]]; then
+    echo "Error: $commandsFile does not exist!"
+    exit 1
+fi
+
+
+# Compile me using make
+echo -e "\nCompiling with make:"
+make
 
 # Run Valgrind
 echo -e "\nRunning Valgrind:"
-valgrind ./MetroSim "$stationsFile" /dev/null "$commandsFile" \
-    > /dev/null 2> /dev/null
+valgrind ./MetroSim "$stationsFile" /dev/null "$commandsFile" > /dev/null
