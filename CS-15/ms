@@ -7,6 +7,8 @@ stations="s$1"
 commands="c$2"
 combined="${stations}${commands}"
 folder="${testFolder}/${combined}"
+folderFile="${folder}/file"
+folderTerm="${folder}/terminal"
 
 # Get stations and commands files
 stationsFile="${testFolder}/${stations}"
@@ -20,42 +22,61 @@ if [[ ! -f "$commandsFile" ]]; then
     exit 1
 fi
 
-# Get out and std prefixes
-combinedPrefix="${folder}/${combined}"
-out="${combinedPrefix}.out"
-stdOut="${combinedPrefix}.stdOut"
-stdErr="${combinedPrefix}.stdErr"
-
-# Get final file names
-outRef="${out}.ref"
-stdOutRef="${stdOut}.ref"
-stdErrRef="${stdErr}.ref"
-outMe="${out}.me"
-stdOutMe="${stdOut}.me"
-stdErrMe="${stdErr}.me"
+# Get names for FILE outputs and references
+outRefFile="${folderFile}/${combined}.out.ref"
+stdOutRefFile="${folderFile}/${combined}.stdOut.ref"
+stdErrRefFile="${folderFile}/${combined}.stdErr.ref"
+outMeFile="${folderFile}/${combined}.out.me"
+stdOutMeFile="${folderFile}/${combined}.stdOut.me"
+stdErrMeFile="${folderFile}/${combined}.stdErr.me"
+# Get names for TERMINAL outputs and references
+outRefTerm="${folderTerm}/${combined}.out.ref"
+stdOutRefTerm="${folderTerm}/${combined}.stdOut.ref"
+stdErrRefTerm="${folderTerm}/${combined}.stdErr.ref"
+outMeTerm="${folderTerm}/${combined}.out.me"
+stdOutMeTerm="${folderTerm}/${combined}.stdOut.me"
+stdErrMeTerm="${folderTerm}/${combined}.stdErr.me"
 
 
 # Create directory
-echo -e "Creating directory:"
-mkdir -p $folder
+echo -e "Creating directories:"
+mkdir -p ${folder}/file
+mkdir -p ${folder}/terminal
 
 # Create references
-echo -e "\nCreating $outRef, $stdOutRef, and ${stdErrRef}:"
-./the_MetroSim "$stationsFile" "$outRef" "$commandsFile" > "$stdOutRef" 2> "$stdErrRef"
+echo -e "\nCreating $outRefFile, $stdOutRefFile, and ${stdErrRefFile}:"
+./the_MetroSim "$stationsFile" "$outRefFile" "$commandsFile" \
+    > "$stdOutRefFile" 2> "$stdErrRefFile"
+echo -e "\nCreating $outRefTerm, $stdOutRefTerm, and ${stdErrRefTerm}:"
+./the_MetroSim "$stationsFile" "$outRefTerm" < "$commandsFile" \
+    > "$stdOutRefTerm" 2> "$stdErrRefTerm"
 
 # Compile me using make
 echo -e "\nCompiling with make:"
 make
 
 # Create mes
-echo -e "\nCreating $outMe, $stdOutMe, and ${stdErrMe}:"
-./MetroSim "$stationsFile" "$outMe" "$commandsFile" > "$stdOutMe" 2> "$stdErrMe"
+echo -e "\nCreating $outMeFile, $stdOutMeFile, and ${stdErrMeFile}:"
+./MetroSim "$stationsFile" "$outMeFile" "$commandsFile" \
+    > "$stdOutMeFile" 2> "$stdErrMeFile" 
+echo -e "\nCreating $outMeTerm, $stdOutMeTerm, and ${stdErrMeTerm}:"
+./MetroSim "$stationsFile" "$outMeTerm" < "$commandsFile" \
+    > "$stdOutMeTerm" 2> "$stdErrMeTerm" 
 
-# Diff
-echo -e "\nRunning diffs:"
-echo -e "\n--- $outRef vs $outMe ---\n"
-diff "$outRef" "$outMe"
-echo -e "\n\n--- $stdOutRef vs $stdOutMe ---\n"
-diff "$stdOutRef" "$stdOutMe"
-echo -e "\n\n--- ${stdErrRef} vs $stdErrMe ---\n"
-diff "$stdErrRef" "$stdErrMe"
+# File diffs
+echo -e "\nRunning file diffs:"
+echo -e "\n--- $outRefFile vs $outMeFile (file) ---\n"
+diff "$outRefFile" "$outMeFile"
+echo -e "\n\n--- $stdOutRefFile vs $stdOutMeFile (file) ---\n"
+diff "$stdOutRefFile" "$stdOutMeFile"
+echo -e "\n\n--- ${stdErrRefFile} vs $stdErrMeFile (file) ---\n"
+diff "$stdErrRefFile" "$stdErrMeFile"
+
+# Terminal diffs
+echo -e "\nRunning terminal diffs:"
+echo -e "\n--- $outRefTerm vs $outMeTerm (terminal) ---\n"
+diff "$outRefTerm" "$outMeTerm"
+echo -e "\n\n--- $stdOutRefTerm vs $stdOutMeTerm (terminal) ---\n"
+diff "$stdOutRefTerm" "$stdOutMeTerm"
+echo -e "\n\n--- ${stdErrRefTerm} vs $stdErrMeTerm (terminal) ---\n"
+diff "$stdErrRefTerm" "$stdErrMeTerm"
