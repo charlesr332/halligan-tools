@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Same as `tw` but with modifications to run with Valgrind.
+#
+#
+# Usage: `./twval {keysFileIndex} [textFileIndex]`
+# Examples:
+# - `./twval 1`
+# - `./twval 2 1`
+
+# Folder where all test files are stored
+testFolder="test"
+valFolder="${testFolder}/val"
+
+# Create val folder if it doesn't exist
+mkdir -p "$valFolder"
+
+# Get keys file
+keysFile="${testFolder}/$1.keys"
+if [[ ! -f "$keysFile" ]]; then
+    echo "Error: $keysFile does not exist!"
+    exit 1
+fi
+
+# File prefix for this test
+filePrefix="${valFolder}/$1"
+
+# Get text file, create copy if it exists
+textFile="${testFolder}/$2.text"
+echo -e "Checking for text file: $textFile"
+if [[ -f "$textFile" ]]; then
+    filePrefix="${valFolder}/$1_$2"
+
+    # Create copy of text file in the test's folder
+    echo -e "\nCreating copy of $textFile in $valFolder:"
+    cp "$textFile" "${filePrefix}.text"
+fi
+
+# Get names for outputs
+out="${filePrefix}.text"
+val="${filePrefix}.val"
+
+
+# We need to run the programs in isolation to prevent them from
+# interfering with the terminal display once the script is done.
+# Lots of Googling/research was involved to figure this out... 😭
+run_isolated() {
+    local session="$1"
+    local command="$2"
+
+    # Clean up stale sessions of same name
+    tmux kill-session -t "$session" 2>/dev/null
+    # Run command in isolated tmux session
+    tmux new-session -d -s "$session" "bash -lc 'cd \"$PWD\" && $command'"
+    # Wait for the program in the tmux session to finish
+    while tmux has-session -t "$session" 2>/dev/null; do
+        sleep 0.1
+    done
+}
+
+# Compile using make
+echo -e "\nCompiling with make:"
+make
+
+# Run with Valgrind
+echo -e "\nRunning Valgrind:"
+run_isolated "twval" "valgrind --leak-check=summary --log-file=\"$val\" \
+    ./typewriter \"$out\" < \"$keysFile\""
+echo -e "\nValgrind report written to $val"
+
+# Remove copy of text file
+rm -f "$out"

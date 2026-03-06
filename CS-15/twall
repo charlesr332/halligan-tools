@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Runs all tests for `tw` and `twval` scripts.
+# I'm so lazy 😂
+
+# tw
+./tw 1
+./tw 2
+./tw 3
+./tw 1 1
+./tw 1 2
+./tw 1 3
+./tw 2 1
+./tw 2 2
+./tw 2 3
+./tw 3 1
+./tw 3 2
+./tw 3 3
+
+# twval
+./twval 1
+./twval 2
+./twval 3
+./twval 1 1
+./twval 1 2
+./twval 1 3
+./twval 2 1
+./twval 2 2
+./twval 2 3
+./twval 3 1
+./twval 3 2
+./twval 3 3

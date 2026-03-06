@@ -1,0 +1,128 @@
+#!/bin/bash
+
+# This is largely based off my `ms` testing script for MetroSim.
+# I removed unncessary output files though and made it run the
+# programs using tmux to isolate them from the terminal display.
+# Otherwise, it would completely mess up line positioning
+# and make the output effectively unreadable.
+#
+#
+# Usage: `./tw {keysFileIndex} [textFileIndex]`
+# Examples:
+# - `./tw 1`
+# - `./tw 2 1`
+#
+# A `test/{keysFileIndex}.keys` file must exist.
+# One can be generated using `./keylogger` with
+# a file name of `test/{keysFileIndex}.keys`.
+#
+# If a text file is provided, a `test/{textFileIndex}.text`
+# file must also exist. If it doesn't exist, the script
+# will just ignore the text file input.
+#
+#
+# The script will generate the following folders/files inside of `test`:
+# - `{keysFileIndex}` or `{keysFileIndex}_{textFileIndex}`
+#   - `{keysFileIndex}.text.ref` or `{keysFileIndex}_{textFileIndex}.text.ref`
+#     (text file from the reference implementation)
+#   - `{keysFileIndex}.log.ref` or `{keysFileIndex}_{textFileIndex}.log.ref`
+#     (log file from the reference implementation)
+#   - `{keysFileIndex}.err.ref` or `{keysFileIndex}_{textFileIndex}.err.ref`
+#     (error stream from the reference implementation)
+#   - `{keysFileIndex}.text.me` or `{keysFileIndex}_{textFileIndex}.text.me`
+#     (text file from your implementation)
+#   - `{keysFileIndex}.log.me` or `{keysFileIndex}_{textFileIndex}.log.me`
+#     (log file from your implementation)
+#   - `{keysFileIndex}.err.me` or `{keysFileIndex}_{textFileIndex}.err.me`
+#     (error stream from your implementation)
+#
+# When re-running a test with existing files, the script will
+# first delete the existing `test/#` folder and then recreate
+# it so that old files don't interfere with new ones.
+
+# Folder where all test files are stored
+testFolder="test"
+
+# Get keys file
+keysFile="${testFolder}/$1.keys"
+if [[ ! -f "$keysFile" ]]; then
+    echo "Error: $keysFile does not exist!"
+    exit 1
+fi
+
+# Subfolder for this test
+folder="${testFolder}/$1"
+filePrefix="${folder}/$1"
+
+recreate_folders() {
+    echo -e "\nRecreating directories:"
+    rm -rf "$folder"
+    mkdir -p "$folder"
+}
+
+# Get text file, create copies if it exists
+textFile="${testFolder}/$2.text"
+echo -e "Checking for text file: $textFile"
+if [[ -f "$textFile" ]]; then
+    folder="${folder}_$2"
+    filePrefix="${folder}/$1_$2"
+
+    # Recreate folders
+    recreate_folders
+    
+    # Create copies of text file in the test's folder
+    echo -e "\nCreating copies of $textFile in $folder:"
+    cp "$textFile" "${filePrefix}.text.ref"
+    cp "$textFile" "${filePrefix}.text.me"
+else
+    recreate_folders
+fi
+
+# Get names for outputs and references
+outRef="${filePrefix}.text.ref"
+logRef="${filePrefix}.log.ref"
+errRef="${filePrefix}.err.ref"
+outMe="${filePrefix}.text.me"
+logMe="${filePrefix}.log.me"
+errMe="${filePrefix}.err.me"
+
+
+# We need to run the programs in isolation to prevent them from
+# interfering with the terminal display once the script is done.
+# Lots of Googling/research was involved to figure this out... 😭
+run_isolated() {
+    local session="$1"
+    local command="$2"
+
+    # Clean up stale sessions of same name
+    tmux kill-session -t "$session" 2>/dev/null
+    # Run command in isolated tmux session
+    tmux new-session -d -s "$session" "bash -lc 'cd \"$PWD\" && $command'"
+    # Wait for the program in the tmux session to finish
+    while tmux has-session -t "$session" 2>/dev/null; do
+        sleep 0.1
+    done
+}
+
+# Create references
+echo -e "\nCreating $outRef, $logRef, and ${errRef}:"
+run_isolated "tw_ref" "./the_typewriter \"$outRef\" \"$logRef\" \
+    < \"$keysFile\" 2> \"$errRef\""
+
+# Compile me using make
+echo -e "\nCompiling with make:"
+make
+
+# Create mes
+echo -e "\nCreating $outMe, $logMe, and ${errMe}:"
+run_isolated "tw_me" "./typewriter \"$outMe\" \"$logMe\" \
+    < \"$keysFile\" 2> \"$errMe\""
+
+# diffs
+echo -e "\nRunning diffs:"
+echo -e "\n--- $outRef vs $outMe ---\n"
+diff "$outRef" "$outMe" | sed -n 'l'
+echo -e "\n\n--- $logRef vs $logMe ---\n"
+diff "$logRef" "$logMe" | sed -n 'l'
+echo -e "\n\n--- $errRef vs $errMe ---\n"
+diff "$errRef" "$errMe" | sed -n 'l'
