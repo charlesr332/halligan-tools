@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#
+# pot = Phase One Tests
+# Charles Rowe (crowe05)
+# 3/24/26
+#
+# CS 15 PROJECT 3 zap
+#
+# Provides an easy way to test the count_freqs function in phaseOne.cpp.
+# See README's "Testing" section for information and instructions!
+#
+
+makeRule="phaseOne_test"
+
+prefix="test/phaseOne/$1/$1."
+input="test/$1.in"
+gt="${prefix}gt"
+out="${prefix}out"
+
+# Check if gt file exists
+if [ ! -f "$gt" ]; then
+    echo "ERROR: Ground truth file $gt does not exist!"
+    echo "You must create this file manually."
+    exit 1
+fi
+
+# Compile with make
+echo "Compiling with make rule $makeRule..."
+make $makeRule
+
+# Generate output file
+echo -e "\nGenerating output file..."
+./$makeRule $input > $out
+
+# diff
+echo -e "\nRunning diff..."
+diff $gt $out

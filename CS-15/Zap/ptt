@@ -1,0 +1,117 @@
+#!/bin/bash
+
+#
+# ptt = Phase Two Tests
+# Charles Rowe (crowe05)
+# 4/1/26
+#
+# CS 15 PROJECT 3 zap
+#
+# Provides an easy way to test Phase Two of the zap program.
+# See README's "Testing" section for information and instructions!
+#
+
+makeRule="zap"
+
+# Compiles our code with the make rule for Phase Two
+function compile {
+    echo -e "\nCompiling with make rule $makeRule..."
+    make $makeRule
+}
+
+# Run a single test of the given name
+#   $1: the name of the test (without .in)
+#   $2: whether all tests are being run (true/false, default: false)
+function run_test {
+    # Check if input file exists
+    input="test/$1.in"
+    if [ ! -f "$input" ]; then
+        echo "ERROR: Input file $input does not exist!"
+        exit 1
+    fi
+
+    testFolder="test/phaseTwo/$1/"
+
+    zapFolder="${testFolder}zap/"
+    zapPrefix="${testFolder}zap/$1."
+    zapGt="${zapPrefix}gt"
+    zapGtStdout="${zapPrefix}gt.stdout"
+    zapGtStderr="${zapPrefix}gt.stderr"
+    zapOut="${zapPrefix}out"
+    zapOutStdout="${zapPrefix}out.stdout"
+    zapOutStderr="${zapPrefix}out.stderr"
+
+    unzapFolder="${testFolder}unzap/"
+    unzapPrefix="${testFolder}unzap/$1."
+    unzapGt="${unzapPrefix}gt"
+    unzapGtStdout="${unzapPrefix}gt.stdout"
+    unzapGtStderr="${unzapPrefix}gt.stderr"
+    unzapOut="${unzapPrefix}out"
+    unzapOutStdout="${unzapPrefix}out.stdout"
+    unzapOutStderr="${unzapPrefix}out.stderr"
+
+    # Create test folders if they don't exist
+    if [ "$2" != "true" ]; then
+        echo -e "\nSetting up test folders..."
+    fi
+    mkdir -p "$zapFolder"
+    mkdir -p "$unzapFolder"
+
+    # Generate ground truth files using the_zap
+    if [ "$2" != "true" ]; then
+        echo -e "\nGenerating ground truth files using the_zap..."
+    fi
+    ./the_zap zap $input $zapGt > $zapGtStdout 2> $zapGtStderr
+    ./the_zap unzap $zapGt $unzapGt > $unzapGtStdout 2> $unzapGtStderr
+
+    # Compile if running individual test
+    if [ "$2" != "true" ]; then
+        compile
+    fi
+
+    # Generate output file
+    if [ "$2" != "true" ]; then
+        echo -e "\nGenerating output files..."
+    fi
+    ./$makeRule zap $input $zapOut > $zapOutStdout 2> $zapOutStderr
+    ./$makeRule unzap $zapOut $unzapOut > $unzapOutStdout 2> $unzapOutStderr
+
+    # diff
+    if [ "$2" != "true" ]; then
+        echo -e "\nRunning diffs..."
+    fi
+
+    # zap diff
+    echo -e "\n------ ${1}: ZAP ------"
+    echo -e "\n--- ${1}.gt.stdout vs ${1}.out.stdout ---"
+    diff $zapGtStdout $zapOutStdout
+    echo -e "\n\n--- ${1}.gt.stderr vs ${1}.out.stderr ---"
+    diff $zapGtStderr $zapOutStderr
+
+    # unzap diff
+    echo -e "\n\n------ ${1}: UNZAP ------"
+    echo -e "\n--- ${1}.gt.stdout vs ${1}.out.stdout ---"
+    diff $unzapGtStdout $unzapOutStdout
+    echo -e "\n\n--- ${1}.gt.stderr vs ${1}.out.stderr ---"
+    diff $unzapGtStderr $unzapOutStderr
+}
+
+
+
+# If first argument does not exist, run all tests
+if [ -z "$1" ]; then
+    # Only compile once for all tests
+    compile
+
+    # Run all tests
+    for testFile in test/*.in; do
+        testName=$(basename "$testFile" .in)
+        echo -e "\n\n=============== Running test: $testName ===============\n"
+        run_test "$testName" true
+    done
+    exit 0
+fi
+
+# If first argument exists, run the test with the given name
+echo -e "=============== Running test: $1 ==============="
+run_test "$1"
