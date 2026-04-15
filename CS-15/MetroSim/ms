@@ -8,7 +8,9 @@ commands="c$2"
 combined="${stations}${commands}"
 folder="${testFolder}/${combined}"
 folderFile="${folder}/file"
+folderFileCombined="${folderFile}/${combined}"
 folderTerm="${folder}/terminal"
+folderTermCombined="${folderTerm}/${combined}"
 
 # Get stations and commands files
 stationsFile="${testFolder}/${stations}"
@@ -23,19 +25,19 @@ if [[ ! -f "$commandsFile" ]]; then
 fi
 
 # Get names for FILE outputs and references
-outRefFile="${folderFile}/${combined}.out.ref"
-stdOutRefFile="${folderFile}/${combined}.stdOut.ref"
-stdErrRefFile="${folderFile}/${combined}.stdErr.ref"
-outMeFile="${folderFile}/${combined}.out.me"
-stdOutMeFile="${folderFile}/${combined}.stdOut.me"
-stdErrMeFile="${folderFile}/${combined}.stdErr.me"
+outRefFile="${folderFileCombined}.out.ref"
+stdOutRefFile="${folderFileCombined}.stdOut.ref"
+stdErrRefFile="${folderFileCombined}.stdErr.ref"
+outMeFile="${folderFileCombined}.out.me"
+stdOutMeFile="${folderFileCombined}.stdOut.me"
+stdErrMeFile="${folderFileCombined}.stdErr.me"
 # Get names for TERMINAL outputs and references
-outRefTerm="${folderTerm}/${combined}.out.ref"
-stdOutRefTerm="${folderTerm}/${combined}.stdOut.ref"
-stdErrRefTerm="${folderTerm}/${combined}.stdErr.ref"
-outMeTerm="${folderTerm}/${combined}.out.me"
-stdOutMeTerm="${folderTerm}/${combined}.stdOut.me"
-stdErrMeTerm="${folderTerm}/${combined}.stdErr.me"
+outRefTerm="${folderTermCombined}.out.ref"
+stdOutRefTerm="${folderTermCombined}.stdOut.ref"
+stdErrRefTerm="${folderTermCombined}.stdErr.ref"
+outMeTerm="${folderTermCombined}.out.me"
+stdOutMeTerm="${folderTermCombined}.stdOut.me"
+stdErrMeTerm="${folderTermCombined}.stdErr.me"
 
 
 # Create directory
